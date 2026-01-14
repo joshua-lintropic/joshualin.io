@@ -115,6 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
         </a>
       </li>
 
+      <li class="social-item">
+        <a href="https://www.goodreads.com/perplexed_panda" class="social-link">
+          <ion-icon name="library"></ion-icon>
+        </a>
+      </li>
+
     </ul>
 
   </div>
