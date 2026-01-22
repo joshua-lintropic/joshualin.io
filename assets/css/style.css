@@ -8,7 +8,37 @@
  */
 
 
+@font-face {
+  font-family: "TeX Gyre Pagella";
+  src: url("./assets/fonts/texgyrepagella-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
+@font-face {
+  font-family: "TeX Gyre Pagella";
+  src: url("./assets/fonts/texgyrepagella-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TeX Gyre Pagella";
+  src: url("./assets/fonts/texgyrepagella-bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "TeX Gyre Pagella";
+  src: url("./assets/fonts/texgyrepagella-bolditalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 
 
 /*-----------------------------------*\
@@ -74,9 +104,20 @@
    */
 
   /* font-family */
-  --ff-poppins: 'Poppins', sans-serif;
+  /* --ff-poppins: 'Poppins', sans-serif; */
+  --ff-pagella: "TeX Gyre Pagella", "Palatino Linotype", Palatino, serif;
+  --ff-poppins: "Poppins", sans-serif;
 
   /* font-size */
+  --fs-1: 1.5rem;      /* 24px / 16 */
+  --fs-2: 1.125rem;    /* 18px / 16 */
+  --fs-3: 1.0625rem;   /* 17px / 16 */
+  --fs-4: 1rem;        /* 16px / 16 */
+  --fs-5: 0.9375rem;   /* 15px / 16 */
+  --fs-6: 0.875rem;    /* 14px / 16 */
+  --fs-7: 0.8125rem;   /* 13px / 16 */
+  --fs-8: 0.6875rem;   /* 11px / 16 */
+  /*
   --fs-1: 24px;
   --fs-2: 18px;
   --fs-3: 17px;
@@ -85,6 +126,7 @@
   --fs-6: 14px;
   --fs-7: 13px;
   --fs-8: 11px;
+  */
 
   /* font-weight */
   --fw-300: 300;
@@ -153,7 +195,11 @@ input, textarea {
 
 :focus { outline-color: var(--orange-yellow-crayola); }
 
-html { font-family: var(--ff-poppins); }
+/* html { font-family: var(--ff-poppins); } */
+html { 
+    font-family: var(--ff-pagella); 
+    font-size: 18px;
+}
 
 body { background: var(--smoky-black); }
 
@@ -1410,6 +1456,7 @@ textarea.form-input::-webkit-resizer { display: none; }
      * typography
      */
 
+    /*
     --fs-1: 32px;
     --fs-2: 24px;
     --fs-3: 26px;
@@ -1417,6 +1464,14 @@ textarea.form-input::-webkit-resizer { display: none; }
     --fs-6: 15px;
     --fs-7: 15px;
     --fs-8: 12px;
+    */
+    --fs-1: 2rem;        /* 32/16 */
+    --fs-2: 1.5rem;      /* 24/16 */
+    --fs-3: 1.625rem;    /* 26/16 */
+    --fs-4: 1.125rem;    /* 18/16 */
+    --fs-6: 0.9375rem;   /* 15/16 */
+    --fs-7: 0.9375rem;   /* 15/16 */
+    --fs-8: 0.75rem;     /* 12/16 */
 
   }
 
