@@ -2047,20 +2047,20 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .contacts-list { grid-template-columns: 1fr; }
 
-  /*
   .contact-info :is(.contact-link) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  */
+  /*
   .contact-info .contact-link {
-    white-space: normal;       /* allow wrapping */
-    overflow-wrap: anywhere;   /* break long emails if needed */
-    word-break: break-word;    /* fallback */
-    overflow: visible;         /* stop clipping */
-    text-overflow: clip;       /* no ellipsis */
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    overflow: visible;
+    text-overflow: clip;
   }
+  */
 
 
   .contact-info :is(.contact-link, time, address) {
