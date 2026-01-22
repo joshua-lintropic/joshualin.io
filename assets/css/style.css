@@ -460,6 +460,7 @@ main {
 }
 
 .contact-info {
+  min-width: 0;
   max-width: calc(100% - 46px);
   width: calc(100% - 46px);
 }
@@ -2046,11 +2047,21 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .contacts-list { grid-template-columns: 1fr; }
 
+  /*
   .contact-info :is(.contact-link) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+  */
+  .contact-info .contact-link {
+    white-space: normal;       /* allow wrapping */
+    overflow-wrap: anywhere;   /* break long emails if needed */
+    word-break: break-word;    /* fallback */
+    overflow: visible;         /* stop clipping */
+    text-overflow: clip;       /* no ellipsis */
+  }
+
 
   .contact-info :is(.contact-link, time, address) {
     --fs-7: 14px;
