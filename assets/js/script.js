@@ -6,9 +6,16 @@
   /* ---------------------------------------------------------------------
    * 1. SIDEBAR TOGGLE (works on all pages that include the sidebar)
    * -------------------------------------------------------------------*/
+  // const sidebar = document.querySelector("[data-sidebar]");
+  // const sidebarBtn = document.querySelector("[data-sidebar-btn]");
+  // sidebarBtn?.addEventListener("click", () => toggleActive(sidebar));
+  document.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-sidebar-btn]");
+  if (!btn) return;
+
   const sidebar = document.querySelector("[data-sidebar]");
-  const sidebarBtn = document.querySelector("[data-sidebar-btn]");
-  sidebarBtn?.addEventListener("click", () => toggleActive(sidebar));
+  sidebar?.classList.toggle("active");
+});
 
   /* ---------------------------------------------------------------------
    * 2. SINGLE‑PAGE NAVIGATION (index.html only)
