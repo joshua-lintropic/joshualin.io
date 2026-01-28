@@ -104,20 +104,20 @@ document.addEventListener('DOMContentLoaded', () => {
       </li>
 
       <li class="social-item">
+        <a href="https://www.goodreads.com/perplexed_panda" class="social-link">
+          <ion-icon name="library"></ion-icon>
+        </a>
+      </li>
+
+      <li class="social-item">
         <a href="https://www.linkedin.com/in/joshua-linsanity/" class="social-link">
           <ion-icon name="logo-linkedin"></ion-icon>
         </a>
       </li>
 
       <li class="social-item">
-        <a href="https://x.com/lintropicjoshua" class="social-link">
-          <ion-icon name="logo-twitter"></ion-icon>
-        </a>
-      </li>
-
-      <li class="social-item">
-        <a href="https://www.goodreads.com/perplexed_panda" class="social-link">
-          <ion-icon name="library"></ion-icon>
+        <a href="https://www.instagram.com/perplexed._.panda/" class="social-link">
+          <ion-icon name="logo-instagram"></ion-icon>
         </a>
       </li>
 
