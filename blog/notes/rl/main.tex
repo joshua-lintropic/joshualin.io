@@ -523,7 +523,7 @@
 \begin{concept}[Proximal Policy Optimization (Schulman et. al., 2017)]
     PPO replaces TRPO's constrained optimization with a \textit{clipped surrogate objective} that implicitly enforces a trust region, achieving comparable or superior empirical performance at dramatically lower implementation and computational cost. Define the probability ratio 
     \[
-        \rho_t(\theta') = \pi_{\theta'}(a_t \mid s_t) / \pi_\theta(a_t \mid s_t)
+        \rho_t(\theta') = \frac{\pi_{\theta'}(a_t \mid s_t)}{\pi_\theta(a_t \mid s_t)}
     \]
     The actor loss is the \textbf{PPO-Clip} objective; for some clipping hyperparameter \(\varepsilon>0\), 
     \[
@@ -566,7 +566,7 @@
     \textbf{Notes.} We discuss several important details. 
     \begin{itemize}
         \item \textit{Minibatch updates.} Unlike TRPO (which performs a single constrained step per batch of data), PPO performs multiple epochs of minibatch SGD on the same batch of trajectories. This is the primary source of its sample efficiency gains. Clipping ensures that each epoch does not stray too far from the data-collecting policy, even without an explicit constraint. 
-        \item \textit{Entropy bonus.} The term \(\beta H(\pi_{\theta'})\) encourages exploration by penalizing deterministic policies. Without it, the policy can prematurely converge to a suboptimal deterministic action. This is especially important in environments with sparse or deceptive rewards.
+        \item \textit{Entropy bonus.} The term \(c_2 \mathcal{H}(\pi_{\theta'})\) encourages exploration by penalizing deterministic policies. Without it, the policy can prematurely converge to a suboptimal deterministic action. This is especially important in environments with sparse or deceptive rewards.
         \item \textit{Value function clipping.} In some implementations (e.g., the original PPO paper), the value function loss is also clipped: 
         \[
             \mathcal{L}^{\text{VF,clip}}(\phi) = \mathbb{E}\left[\max\left((V_\phi(s_t) - R_t)^2,\; (V_{\phi_{\text{old}}}(s_t) + \text{clip}(\Delta V, -\varepsilon, \varepsilon) - R_t)^2\right)\right]
@@ -619,7 +619,7 @@
 \begin{remark}
     \textbf{Notes.} Advantage normalization (Line 6) is a critical implementation detail: it centers the advantages to have zero mean and unit variance across the batch, ensuring that roughly half the actions are reinforced and half are suppressed, regardless of the absolute scale of returns. This is conceptually related to the average reward baseline discussed in REINFORCE. 
 
-    Standard hyperparameters (from the original paper and subsequent best practices) are \(\varepsilon = 0.2\), \(\lambda = 0.95\), \(\gamma = 0.99\), \(K = 3\text{--}10\) epochs, and \(\alpha = 0.5\), \(\beta = 0.01\). The number of epochs \(K\) must be tuned carefully: too few epochs waste data, while too many can degrade performance as the ratio \(\rho_t\) drifts and the advantage estimates become stale.
+    Standard hyperparameters (from the original paper and subsequent best practices) are \(\varepsilon = 0.2\), \(\lambda = 0.95\), \(\gamma = 0.99\), \(K = 3\text{--}10\) epochs, and \(c_1 = 0.5\), \(c_2 = 0.01\). The number of epochs \(K\) must be tuned carefully: too few epochs waste data, while too many can degrade performance as the ratio \(\rho_t\) drifts and the advantage estimates become stale.
 
     \textbf{PPO-Penalty.} An alternative formulation replaces clipping with a soft KL penalty, 
     \[
