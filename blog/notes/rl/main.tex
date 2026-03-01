@@ -109,20 +109,87 @@
 \end{concept}
 
 \begin{remark}
-    There is an operator-theoretic representation: view \(V^\pi \in \mathbb{R}^S\) and \(Q^\pi \in \mathbb{R}^{SA}\), and define \(\mathbb{P} \in \mathbb{R}^{SA \times S}\) to be the transition dynamics \(\mathbb{P}_{(s,a), s'} = \mathbb{P}(s' \mid s, a)\). Then TODO
+    There is an operator-theoretic representation: view \(V^\pi \in \mathbb{R}^S\) and \(Q^\pi \in \mathbb{R}^{SA}\), and define \(\mathbb{P} \in \mathbb{R}^{SA \times S}\) to be the transition dynamics \(\mathbb{P}_{(s,a), s'} = \mathbb{P}(s' \mid s, a)\). Let \(\Pi_\pi \in \mathbb{R}^{S \times SA}\) be the policy matrix with \((\Pi_\pi)_{s,(s',a)} = \mathbf{1}[s = s'] \pi(a \mid s)\), and let \(r \in \mathbb{R}^{SA}\) be the reward vector. Then the Bellman consistency equations become
+    \[
+        Q^\pi = r + \gamma \mathbb{P} \Pi_\pi Q^\pi, \qquad V^\pi = \Pi_\pi Q^\pi
+    \]
+    Define the \textit{Bellman evaluation operator} \(\mathcal{T}^\pi : \mathbb{R}^{SA} \to \mathbb{R}^{SA}\) by \(\mathcal{T}^\pi Q = r + \gamma \mathbb{P} \Pi_\pi Q\). Then \(Q^\pi\) is the unique fixed point of \(\mathcal{T}^\pi\), and since \(\mathcal{T}^\pi\) is a \(\gamma\)-contraction in \(\|\cdot\|_\infty\), the solution is
+    \[
+        Q^\pi = (I - \gamma \mathbb{P}\Pi_\pi)^{-1} r
+    \]
+    Similarly, the \textit{Bellman optimality operator} \(\mathcal{T}^* Q = r + \gamma \mathbb{P} \max_\pi \Pi_\pi Q\) has unique fixed point \(Q^*\), and the optimal policy is \(\pi^*(s) = \argmax_a Q^*(s,a)\). Value iteration is precisely the repeated application \(Q_{k+1} = \mathcal{T}^* Q_k\), which converges at rate \(\gamma^k\).
 \end{remark}
 
-\begin{concept}[Value Iteration]
-    The goal of value iteration is to find the policy \(\pi^*\) whose values satisfy \(V^*(s) = \max_\pi V^\pi(s)\) and \(Q^*(s) = \max_\pi Q^\pi(s)\). It turns out there is a \textit{deterministic} policy which is \textit{simultaneously} optimal for all starting states \(s\). 
+\begin{concept}[Temporal Difference Learning]
+    TD learning updates the value function using \textit{bootstrapped} estimates rather than waiting for complete trajectory returns. The \textbf{TD(0)} update rule is
+    \[
+        V(s_t) \leftarrow V(s_t) + \alpha \underbrace{\left(r(s_t, a_t) + \gamma V(s_{t+1}) - V(s_t)\right)}_{\delta_t \text{ (TD error)}}
+    \]
+    More generally, \textbf{TD(\(\lambda\))} interpolates between TD(0) and Monte Carlo via eligibility traces. Define the \(n\)-step return
+    \[
+        G_t^{(n)} = \sum_{k=0}^{n-1} \gamma^k r_{t+k} + \gamma^n V(s_{t+n})
+    \]
+    Then the \(\lambda\)-return is an exponentially-weighted average of all \(n\)-step returns,
+    \[
+        G_t^\lambda = (1 - \lambda) \sum_{n=1}^{T-t} \lambda^{n-1} G_t^{(n)}
+    \]
+    TD(0) is biased but low-variance (it bootstraps from \(V\), which may be inaccurate), while Monte Carlo (\(\lambda = 1\)) is unbiased but high-variance. TD methods are \textit{off-policy compatible} and converge under standard stochastic approximation conditions (Robbins-Monro). With function approximation \(V_\phi\), the update becomes semi-gradient:
+    \[
+        \phi \leftarrow \phi + \alpha \delta_t \nabla_\phi V_\phi(s_t)
+    \]
+    where crucially the gradient is \textit{not} taken through the bootstrap target \(V_\phi(s_{t+1})\).
 \end{concept}
 
-\begin{concept}[SARSA (TODO)]
+\begin{concept}[SARSA and Expected SARSA]
+    \textbf{SARSA} (State-Action-Reward-State-Action) is the on-policy analogue of TD(0) for the action-value function. At each step, the agent observes \((s_t, a_t, r_t, s_{t+1}, a_{t+1})\) and updates
+    \[
+        Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left( r_t + \gamma Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t) \right)
+    \]
+    Since \(a_{t+1} \sim \pi(\cdot \mid s_{t+1})\), SARSA evaluates the \textit{behavior policy} including exploration (e.g., \(\varepsilon\)-greedy), making it on-policy. This causes SARSA to learn more conservative policies in stochastic environments, since it accounts for the cost of exploratory actions.
+
+    \textbf{Expected SARSA} replaces the sampled next action with an expectation over the policy,
+    \[
+        Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \left( r_t + \gamma \mathbb{E}_{a' \sim \pi(\cdot \mid s_{t+1})}[Q(s_{t+1}, a')] - Q(s_t, a_t) \right)
+    \]
+    This eliminates the variance from sampling \(a_{t+1}\) while remaining on-policy. When \(\pi\) is greedy, Expected SARSA reduces to Q-learning; when \(\pi\) is \(\varepsilon\)-greedy, it provides a strictly lower-variance alternative to SARSA. In tabular settings, Expected SARSA converges under the same conditions as Q-learning but with empirically faster convergence.
 \end{concept}
 
-\begin{concept}[Deep Q Networks (TODO)]
+\begin{concept}[Deep Q Networks (Mnih et. al., 2015)]
+    DQN extends Q-learning to high-dimensional state spaces by approximating \(Q^*\) with a neural network \(Q_\phi\). Two key innovations stabilize training:
+    \begin{itemize}
+        \item \textbf{Experience replay.} Transitions \((s_t, a_t, r_t, s_{t+1})\) are stored in a replay buffer \(\mathcal{D}\) and sampled uniformly at random for training. This breaks temporal correlations between consecutive samples and improves data efficiency.
+        \item \textbf{Target network.} A separate target network \(Q_{\phi^-}\) with parameters \(\phi^-\) is used to compute TD targets, with \(\phi^-\) updated slowly (either by periodic copying or Polyak averaging \(\phi^- \leftarrow \tau \phi + (1 - \tau)\phi^-\)).
+    \end{itemize}
+    The loss minimized is the mean squared Bellman error over minibatches from the replay buffer,
+    \[
+        \mathcal{L}(\phi) = \mathbb{E}_{(s,a,r,s') \sim \mathcal{D}} \left[ \left( r + \gamma \max_{a'} Q_{\phi^-}(s', a') - Q_\phi(s, a) \right)^2 \right]
+    \]
+    The agent acts \(\varepsilon\)-greedily with respect to \(Q_\phi\), typically with \(\varepsilon\) annealed from \(1.0\) to \(0.1\) over training.
 \end{concept}
 
-\begin{concept}[Rainbow (TODO)]
+\begin{remark}
+    \textbf{Notes.} Without target networks, the TD target \(r + \gamma \max_{a'} Q_\phi(s', a')\) moves with every gradient step, creating a ``chasing a moving target'' phenomenon that causes oscillation or divergence. The target network provides a quasi-stationary objective over many updates.
+
+    \textbf{Double DQN.} Vanilla DQN suffers from \textit{maximization bias}: the \(\max_{a'} Q_{\phi^-}(s', a')\) operator systematically overestimates values since \(\mathbb{E}[\max_i X_i] \geq \max_i \mathbb{E}[X_i]\). Double DQN (van Hasselt et. al., 2016) decouples action selection from evaluation,
+    \[
+        y = r + \gamma Q_{\phi^-}(s', \argmax_{a'} Q_\phi(s', a'))
+    \]
+    The online network \(Q_\phi\) selects the best action, but the target network \(Q_{\phi^-}\) evaluates it. This significantly reduces overestimation and improves stability.
+
+    \textbf{Issues.} DQN is limited to discrete action spaces (the \(\max\) over actions is intractable for continuous \(\mathcal{A}\)), does not naturally encourage exploration beyond \(\varepsilon\)-greedy, and the replay buffer introduces off-policy bias that can compound with function approximation errors (the ``deadly triad'' of function approximation, bootstrapping, and off-policy learning).
+\end{remark}
+
+\begin{concept}[Rainbow (Hessel et. al., 2018)]
+    Rainbow combines six orthogonal improvements to DQN into a single integrated agent:
+    \begin{itemize}
+        \item \textbf{Double Q-learning}: decouples action selection from evaluation to reduce overestimation bias.
+        \item \textbf{Prioritized experience replay}: samples transitions with probability proportional to their TD error magnitude \(|\delta_t|\), focusing learning on surprising or poorly-predicted transitions. Importance sampling weights correct for the induced bias.
+        \item \textbf{Dueling networks}: decomposes the Q-function as \(Q_\phi(s, a) = V_\psi(s) + A_\xi(s, a) - \frac{1}{|\mathcal{A}|}\sum_{a'} A_\xi(s, a')\), allowing the network to separately learn state value and action advantage. The centering ensures identifiability.
+        \item \textbf{Multi-step returns}: replaces the one-step TD target with an \(n\)-step return \(G_t^{(n)} = \sum_{k=0}^{n-1} \gamma^k r_{t+k} + \gamma^n \max_{a'} Q_{\phi^-}(s_{t+n}, a')\), propagating reward signal faster at the cost of some off-policy bias.
+        \item \textbf{Distributional RL (C51)}: models the full return distribution \(Z(s, a)\) rather than its expectation \(Q(s,a) = \mathbb{E}[Z(s,a)]\), representing the distribution as a categorical over a fixed set of atoms and minimizing the projected KL divergence to the distributional Bellman target.
+        \item \textbf{Noisy networks}: replaces \(\varepsilon\)-greedy exploration with learned stochastic linear layers \(y = (\mu_w + \sigma_w \odot \varepsilon_w) x + \mu_b + \sigma_b \odot \varepsilon_b\), where \(\varepsilon\) is sampled noise. The noise parameters \(\sigma\) are learned, enabling state-dependent exploration that adapts over training.
+    \end{itemize}
+    The ablation study in the original paper demonstrates that each component contributes positively, with distributional RL and prioritized replay providing the largest individual gains. Rainbow achieved state-of-the-art performance on the Atari-57 benchmark at the time of publication.
 \end{concept}
 
 \newpage
